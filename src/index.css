@@ -5,6 +5,11 @@
 @plugin "@tailwindcss/typography";
 @plugin "tailwindcss-animate";
 
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
 @import '@radix-ui/colors/black-alpha.css';
 @import '@radix-ui/colors/white-alpha.css';
 @import '@radix-ui/colors/gray.css';
@@ -306,6 +311,10 @@ html {
 
 body {
   @apply bg-background min-h-dvh;
+}
+
+#app {
+  @apply min-h-dvh;
 }
 
 html,

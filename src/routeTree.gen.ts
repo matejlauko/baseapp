@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as UisinkImport } from './routes/uisink'
+import { Route as AuthImport } from './routes/auth'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 
@@ -20,6 +21,12 @@ import { Route as IndexImport } from './routes/index'
 const UisinkRoute = UisinkImport.update({
   id: '/uisink',
   path: '/uisink',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRoute = AuthImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,6 +60,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
     '/uisink': {
       id: '/uisink'
       path: '/uisink'
@@ -68,12 +82,14 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/uisink': typeof UisinkRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/uisink': typeof UisinkRoute
 }
 
@@ -81,27 +97,30 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/uisink': typeof UisinkRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/uisink'
+  fullPaths: '/' | '/about' | '/auth' | '/uisink'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/uisink'
-  id: '__root__' | '/' | '/about' | '/uisink'
+  to: '/' | '/about' | '/auth' | '/uisink'
+  id: '__root__' | '/' | '/about' | '/auth' | '/uisink'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AuthRoute: typeof AuthRoute
   UisinkRoute: typeof UisinkRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AuthRoute: AuthRoute,
   UisinkRoute: UisinkRoute,
 }
 
@@ -117,6 +136,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/auth",
         "/uisink"
       ]
     },
@@ -125,6 +145,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/auth": {
+      "filePath": "auth.tsx"
     },
     "/uisink": {
       "filePath": "uisink.tsx"

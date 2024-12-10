@@ -1,8 +1,17 @@
-import * as React from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/about')({
   component: AboutComponent,
+  beforeLoad: ({ context, location }) => {
+    if (!context.auth.session) {
+      throw redirect({
+        to: '/auth',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+  },
 })
 
 function AboutComponent() {

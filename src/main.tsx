@@ -3,11 +3,16 @@ import ReactDOM from 'react-dom/client'
 import { routeTree } from './routeTree.gen'
 
 import './index.css'
+import { AuthProvider } from './lib/auth/auth-provider'
+import { useAuth } from './lib/auth/use-auth'
 
 // Set up a Router instance
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
+  context: {
+    auth: undefined!, // This will be set after we wrap the app in an AuthProvider
+  },
 })
 
 // Register things for typesafety
@@ -17,9 +22,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+function App() {
+  const auth = useAuth()
+
+  if (auth.status === 'loading') {
+    return null
+  }
+
+  return <RouterProvider router={router} context={{ auth }} />
+}
+
 const rootElement = document.getElementById('app')!
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
-  root.render(<RouterProvider router={router} />)
+  root.render(
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  )
 }

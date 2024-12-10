@@ -44,8 +44,8 @@ export const ThemeProvider = ({
   }
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext {...props} value={value}>
       {children}
-    </ThemeProviderContext.Provider>
+    </ThemeProviderContext>
   )
 }
