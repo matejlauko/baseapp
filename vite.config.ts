@@ -6,5 +6,13 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [TanStackRouterVite({}), react(), tsconfigPaths(), tailwindcss()],
+  plugins: [
+    TanStackRouterVite({
+      routesDirectory: 'app/routes',
+      generatedRouteTree: 'app/routeTree.gen.ts',
+    }),
+    react(),
+    tsconfigPaths(),
+    tailwindcss(),
+  ],
 })

@@ -1,0 +1,42 @@
+@import './theme.css';
+
+@layer base {
+  * {
+    @apply border-border min-h-0 min-w-0;
+  }
+
+  html {
+    color-scheme: light dark;
+    @apply text-foreground antialiased;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background min-h-dvh;
+  }
+
+  #app {
+    @apply min-h-dvh;
+
+    --bottom-bar-height: theme(size.12);
+  }
+
+  html,
+  body {
+    @media (prefers-color-scheme: dark) {
+      color-scheme: dark;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-balance;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+}
