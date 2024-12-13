@@ -1,5 +1,5 @@
 import { filterAndSortList, FilterRankings } from '@os/utils'
-import type { Items } from './item'
+import type { Items } from './items'
 import type { ItemSearchTerms } from './store'
 
 export function filterItems(items: Items, searchTerms: ItemSearchTerms): Items {

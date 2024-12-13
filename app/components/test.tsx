@@ -1,5 +1,5 @@
 import { useDB, useMutation, useSub } from '@/lib/db/use-db'
-import { ItemType } from '@/modules/items/item'
+import { ItemType } from '@/modules/items/items'
 import { createItemMutation } from '@/modules/items/mutators'
 import { listItems } from '@/modules/items/queries'
 import { format } from 'date-fns'

@@ -1,6 +1,6 @@
 import { StickyNoteIcon } from 'lucide-react'
 import * as React from 'react'
-import type { ItemType } from '../item'
+import type { ItemType } from '../items'
 
 interface Props {
   type: ItemType

@@ -87,8 +87,8 @@ export async function pullSyncHandler(
             text: item.text,
             type: item.type,
             tags: item.tags,
-            createdAt: item.createdAt.toISOString(),
-            updatedAt: item.updatedAt?.toISOString() ?? null,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt ?? null,
           },
         })
       }

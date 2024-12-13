@@ -1,0 +1,148 @@
+@import 'tailwindcss';
+@import './typography.css';
+
+/* Inspired by TailwindCSS Prose: https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js */
+
+.EditorContainer > div {
+  height: 100%;
+}
+
+.Editor {
+  max-width: 100%;
+  max-height: 100%;
+  height: 100%;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:not(.dragging) .ProseMirror-selectednode {
+    @apply bg-neutral-400;
+    outline: none !important;
+    border-radius: 0.2rem;
+    transition: background-color 0.2s;
+    box-shadow: none;
+  }
+}
+
+.EditorContent {
+  & li {
+    margin-block: calc(8em / 16);
+  }
+
+  & ul {
+    list-style-type: disc;
+    margin-block: calc(20em / 16);
+    padding-inline-start: calc(26em / 16);
+
+    & > li {
+      padding-inline-start: calc(6em / 16);
+    }
+
+    & > li::marker {
+      @apply text-neutral-300;
+    }
+
+    & > li > p {
+      margin-block: calc(8em / 16);
+    }
+  }
+
+  &ol {
+    list-style-type: decimal;
+    margin-block: calc(20em / 16);
+    padding-inline-start: calc(26em / 16);
+
+    & > li {
+      padding-inline-start: calc(6em / 16);
+    }
+
+    & > li::marker {
+      @apply text-neutral-500;
+      font-weight: 400;
+    }
+
+    & > li > p {
+      margin-block: calc(8em / 16);
+    }
+  }
+
+  & ul ul,
+  & ul ol,
+  & ol ul,
+  & ol ol {
+    margin-block: calc(12em / 16);
+  }
+
+  & hr {
+    @apply border-t border-neutral-200;
+    margin-block: calc(36em / 16);
+  }
+
+  & img {
+    transition: filter 0.1s ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      filter: brightness(90%);
+    }
+
+    &.ProseMirror-selectednode {
+      filter: brightness(90%);
+    }
+  }
+
+  & img,
+  & picture {
+    display: block;
+    margin-block: calc(32em / 16);
+  }
+
+  & picture > img {
+    margin-block: 0;
+  }
+
+  /* Code */
+  & code {
+    @apply bg-neutral-100 font-mono text-neutral-900;
+    font-size: calc(14em / 16);
+    font-weight: 600;
+    border-radius: calc(4rem / 16);
+    padding-block: calc(6em / 14);
+    padding-inline: calc(8em / 14);
+  }
+
+  & pre {
+    @apply bg-neutral-50 font-mono text-neutral-700;
+    font-size: calc(14em / 16);
+    line-height: calc(24 / 14);
+    border-radius: calc(8rem / 16);
+    margin-block: calc(24em / 14);
+    padding-block: calc(12em / 14);
+    padding-inline: calc(16em / 14);
+    overflow-x: auto;
+    font-weight: 400;
+
+    & code {
+      background-color: transparent;
+      border-width: 0;
+      border-radius: 0;
+      padding: 0;
+      font-weight: inherit;
+      color: inherit;
+      font-size: inherit;
+      font-family: inherit;
+      line-height: inherit;
+
+      &::before,
+      &::after {
+        content: none;
+      }
+    }
+  }
+}
+
+/* Overwrite tippy-box original max-width */
+.tippy-box {
+  max-width: 400px !important;
+}

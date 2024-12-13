@@ -1,4 +1,4 @@
-import type { Item } from '@/modules/items/item'
+import type { Item } from '@/modules/items/items'
 
 export const DEFAULT_ITEMS = [
   {

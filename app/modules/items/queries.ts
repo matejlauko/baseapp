@@ -1,6 +1,6 @@
 import { generate } from '@rocicorp/rails'
 import type { ReadTransaction } from 'replicache'
-import { ITEMS_PREFIX, type Item, type ItemId } from './item'
+import { ITEMS_PREFIX, type Item, type ItemId } from './items'
 
 export const itemQueries = generate<Item>(ITEMS_PREFIX)
 

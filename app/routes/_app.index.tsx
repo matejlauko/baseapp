@@ -1,41 +1,33 @@
-import { BottomBar } from '@/components/bottom-bar'
-import { useAuth } from '@/lib/auth/use-auth'
-import { Button } from '@/lib/ui/button'
+import { ListProvider } from '@/components/list/list-provider'
+import { useSub } from '@/lib/db/use-db'
+import ItemInput from '@/modules/input/components/item-input'
 import ItemsList from '@/modules/items/components/items-list'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { listItems } from '@/modules/items/queries'
+import { createFileRoute } from '@tanstack/react-router'
+
+import '@/components/editor/styles/editor.css'
 
 export const Route = createFileRoute('/_app/')({
   component: AppPage,
 })
 
 function AppPage() {
-  const router = useRouter()
-  const auth = useAuth()
-
-  const handleLogout = () => {
-    auth.signOut().then(() => {
-      router.invalidate().finally(() => {
-        router.navigate({ to: '/auth' })
-      })
-    })
-  }
+  const items = useSub(listItems)
 
   return (
     <>
-      <div className="mb-(--bottom-bar-height) flex h-dvh flex-col">
-        <div className="container">
-          <ItemsList />
-        </div>
-      </div>
+      <div className="mb-(--bottom-bar-height) flex min-h-dvh flex-col py-8" data-selected="1">
+        <ListProvider items={items}>
+          <div className="fixed top-0 right-0 left-0 z-1 min-h-20 pt-8 before:absolute before:inset-0 before:h-8 before:backdrop-blur-md [body[data-scroll-locked]_&]:mr-(--removed-body-scroll-bar-size)">
+            <div className="container">
+              <ItemInput />
+            </div>
+          </div>
+          <div className="h-12" />
 
-      <BottomBar>
-        <div>
-          {auth.session?.user.email} :{' '}
-          <Button variant="ghost" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      </BottomBar>
+          <div className="container">{items && <ItemsList />}</div>
+        </ListProvider>
+      </div>
     </>
   )
 }

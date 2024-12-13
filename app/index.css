@@ -13,7 +13,7 @@
   }
 
   body {
-    @apply bg-background min-h-dvh;
+    @apply bg-background min-h-dvh text-base ring-red-900;
   }
 
   #app {

@@ -1,8 +1,8 @@
 import { getLogger } from '@os/logger'
 
 import type { DB } from '../../libs/db'
-import type { ItemData, Items } from './item'
-import { ItemType, ItemTypes } from './item'
+import type { ItemData, Items } from './items'
+import { ItemType, ItemTypes } from './items'
 import { listItems } from './queries'
 import { itemsStore } from './store'
 

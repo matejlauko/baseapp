@@ -1,5 +1,7 @@
+import { addCommands, removeCommands } from '@/components/commander/commander-store'
+import { useList } from '@/components/list/use-list'
+import { MarkdownContent } from '@/components/markdown-content'
 import { useMutation } from '@/lib/db/use-db'
-import { getLogger } from '@/lib/logger'
 import { Checkbox } from '@/lib/ui/checkbox'
 import {
   ContextMenu,
@@ -11,26 +13,33 @@ import { useToast } from '@/lib/ui/use-toast'
 import { useNavigate } from '@tanstack/react-router'
 import { format as formatDate } from 'date-fns'
 import { CopyIcon, TrashIcon } from 'lucide-react'
-import * as React from 'react'
-import { ItemType, type Item } from '../item'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { usePress } from 'react-aria'
+import { ItemType, type Item as IItem } from '../items'
 import { createItemMutation, deleteItemMutation, updateItemMutation } from '../mutators'
 import ItemIcon from './item-icon'
 
 interface Props {
-  item: Item
+  item: IItem
   isSelected: boolean
 }
 
-const { captureError } = getLogger('item')
-
-const Item: React.FC<Props> = ({ item, isSelected }) => {
+function Item({ item, isSelected }: Props) {
+  const itemRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const createItem = useMutation(createItemMutation)
   const deleteItem = useMutation(deleteItemMutation)
   const updateItem = useMutation(updateItemMutation)
   const { toast } = useToast()
+  const { selectItem } = useList()
 
-  const handleDuplicateItem = async (duplicatedItem: Item) => {
+  const { pressProps } = usePress({
+    onPress: () => {
+      selectItem(item.id)
+    },
+  })
+
+  const handleDuplicateItem = async (duplicatedItem: IItem) => {
     if (await createItem(duplicatedItem)) {
       toast({
         title: 'Item duplicated',
@@ -67,6 +76,31 @@ const Item: React.FC<Props> = ({ item, isSelected }) => {
     })
   }
 
+  useLayoutEffect(() => {
+    if (isSelected) {
+      itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [isSelected])
+
+  useEffect(() => {
+    const commands = [
+      {
+        name: 'Delete item',
+        icon: TrashIcon,
+        shortcut: 'backspace',
+        action: () => handleDeleteItem(item.id),
+      },
+    ]
+
+    if (isSelected) {
+      addCommands(commands)
+    }
+
+    return () => {
+      removeCommands(commands)
+    }
+  }, [isSelected])
+
   // Format date to user friendly format
   // Omit year if it's the current year
   const getCreatedAt = (date: string) => {
@@ -81,7 +115,11 @@ const Item: React.FC<Props> = ({ item, isSelected }) => {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
-        <div className="group/item relative flex min-h-10 items-center gap-x-3 gap-y-1 px-3 py-2">
+        <div
+          className="group/item relative flex min-h-10 scroll-m-4 items-center gap-x-3 gap-y-1 px-3 py-2"
+          {...pressProps}
+          ref={itemRef}
+        >
           <div className="grid w-4">
             {item.type === ItemType.Task ? (
               <div className="grid place-content-center">
@@ -96,8 +134,7 @@ const Item: React.FC<Props> = ({ item, isSelected }) => {
           </div>
 
           <div className="flex-1 select-text">
-            {/* <MarkdownContent className="font-medium">{item.title}</MarkdownContent> */}
-            <div className="font-medium">{item.text}</div>
+            <MarkdownContent className="EditorContent font-medium">{item.text}</MarkdownContent>
           </div>
 
           {/* <div className="flex items-center gap-x-1">

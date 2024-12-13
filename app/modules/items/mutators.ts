@@ -13,7 +13,7 @@ import {
   type Item,
   type ItemId,
   type UpdateItemData,
-} from './item'
+} from './items'
 
 const { captureError } = getLogger('items')
 
