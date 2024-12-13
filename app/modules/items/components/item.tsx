@@ -83,13 +83,13 @@ function Item({ item, isSelected }: Props) {
       {
         name: `Delete item - ${item.text}`,
         icon: TrashIcon,
-        hotkey: 'mod+backspace',
+        hotkey: 'meta+backspace',
         action: () => handleDeleteItem(item.id),
       },
       {
         name: `Duplicate item - ${item.text}`,
         icon: CopyIcon,
-        hotkey: 'mod+d',
+        hotkey: 'meta+d',
         action: () => handleDuplicateItem(item),
       },
     ].filter(skipMaybe)
@@ -165,9 +165,7 @@ function Item({ item, isSelected }: Props) {
         }}
       >
         <ContextMenuItem
-          onSelect={(event) => {
-            event.stopPropagation()
-
+          onSelect={() => {
             handleDuplicateItem(item)
           }}
         >
@@ -176,10 +174,7 @@ function Item({ item, isSelected }: Props) {
         </ContextMenuItem>
         <ContextMenuItem
           color="red"
-          onSelect={(event) => {
-            event.stopPropagation()
-            event.stopImmediatePropagation()
-
+          onSelect={() => {
             handleDeleteItem(item.id)
           }}
         >

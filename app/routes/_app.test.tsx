@@ -28,9 +28,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
 import type { CreateItemData } from 'database/schema'
 import { format as formatDate } from 'date-fns'
+import isHotkey from 'is-hotkey'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_app/test')({
@@ -38,6 +40,10 @@ export const Route = createFileRoute('/_app/test')({
 })
 
 function TestPage() {
+  useHotkeys('mod+k', (event) => {
+    console.log('k', event, { isPressed: isHotkey('mod+k', event) })
+  })
+
   return (
     <div className="container py-4">
       <div className="mb-4 flex items-center justify-between">

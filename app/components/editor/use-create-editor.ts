@@ -7,7 +7,7 @@ import { useEditor as useTipTapEditor, type Editor, type EditorOptions } from '@
 import { useMemo } from 'react'
 import { getExtensions } from './extensions'
 
-export interface UseEditorOptions extends Partial<Omit<EditorOptions, 'onUpdate'>> {
+export interface UseCreateEditorOptions extends Partial<Omit<EditorOptions, 'onUpdate'>> {
   className?: string
   onDebouncedUpdate?: (editor: Editor) => void | Promise<void>
   /**
@@ -23,7 +23,7 @@ export interface UseEditorOptions extends Partial<Omit<EditorOptions, 'onUpdate'
   onUpdate?: (editor: Editor) => void
 }
 
-export const useEditor = ({
+export const useCreateEditor = ({
   placeholder,
   className,
   onUpdate,
@@ -37,7 +37,7 @@ export const useEditor = ({
   onSubmit,
   onCancel,
   ...otherOptions
-}: UseEditorOptions) => {
+}: UseCreateEditorOptions) => {
   const debouncedUpdates = useDebouncedCallback(
     async (editor: Editor) => {
       return onDebouncedUpdate?.(editor)

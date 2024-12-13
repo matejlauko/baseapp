@@ -7,8 +7,9 @@ import {
   CommandShortcut,
 } from '@/lib/ui/command'
 import { skipMaybe } from '@/lib/utils'
+import isHotkey from 'is-hotkey'
 import { useMemo, useState } from 'react'
-import { isHotkeyPressed, useHotkeys } from 'react-hotkeys-hook'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { useSnapshot } from 'valtio'
 import { commanderStore } from './commander-store'
 
@@ -32,10 +33,8 @@ export function Commander() {
   useHotkeys(
     hotkeys,
     (event) => {
-      console.log('COMMAND', event)
-
       for (const command of commands) {
-        if (command.hotkey && isHotkeyPressed(command.hotkey)) {
+        if (command.hotkey && isHotkey(command.hotkey, event)) {
           console.log('HOTKEY PRESSED', command.hotkey)
 
           command.action()
@@ -48,6 +47,7 @@ export function Commander() {
       enableOnContentEditable: open,
       enableOnFormTags: open,
       preventDefault: true,
+      // scopes: ['commander'],
     },
     [open, commands]
   )

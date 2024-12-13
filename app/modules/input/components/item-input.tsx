@@ -1,6 +1,7 @@
 import { Editor } from '@/components/editor/editor'
-import { useEditor } from '@/components/editor/use-editor'
+import { useCreateEditor } from '@/components/editor/use-create-editor'
 import { listStore } from '@/components/list/list-store'
+import { useList } from '@/components/list/use-list'
 import { useMutation } from '@/lib/db/use-db'
 import { getLogger } from '@/lib/logger'
 import { cn } from '@/lib/ui/utils'
@@ -12,16 +13,10 @@ import { inputStore } from '../store'
 
 const { captureError } = getLogger('input')
 
-export interface ItemInputApi {
-  focus: () => void
-  blur: () => void
-  isFocused: () => boolean
-  hasContent: () => boolean
-}
-
 function ItemInput() {
   const createItem = useMutation(createItemMutation)
   const { selectedItemId } = useSnapshot(listStore)
+  const { selectNext } = useList()
 
   const handleSubmit = () => {
     const content = editor?.storage.markdown.getMarkdown()?.trim()
@@ -43,7 +38,7 @@ function ItemInput() {
     })
   }
 
-  const editor = useEditor({
+  const editor = useCreateEditor({
     placeholder: 'Idea, task, note…',
     shouldCancelOnEscape: true,
     shouldSubmitOnCmdEnter: true,
@@ -71,9 +66,10 @@ function ItemInput() {
   /* Starts writing in the editor when pressing a letter or a number wherever */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // If user is focused on editor, has has more content than 1 paragraph, stop other keyboard events (list nav)
-      if (editor?.isFocused && editor?.state.doc.childCount > 1) {
-        event.stopImmediatePropagation()
+      // When pressing down arrow, select next item, but only if the editor doesn't have more than 1 paragraph
+      if (event.key === 'ArrowDown' && editor?.isFocused && editor?.state.doc.childCount <= 1) {
+        event.preventDefault()
+        selectNext()
       }
 
       // If user is focused out and pressed a letter or a number key, focus the editor, without
@@ -91,9 +87,9 @@ function ItemInput() {
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [editor])
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [editor, selectNext])
 
   /* Focus when no item is selected, blur when an item is selected */
   useEffect(() => {
