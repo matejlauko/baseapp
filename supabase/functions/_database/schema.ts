@@ -31,19 +31,19 @@ export const Items = appBaseSchema.table('items', {
   revision: bigint('revision', { mode: 'bigint' }).notNull(),
 })
 
-// type SelectItem = typeof Items.$inferSelect
-// type InsertItem = typeof Items.$inferInsert
+export type SelectItem = typeof Items.$inferSelect
+export type InsertItem = typeof Items.$inferInsert
 
 // const commonSchemaRefine = {
 //   tags: z.array(z.string()),
 // }
 
-export const selectItemDataSchema = createSelectSchema(Items).omit({
+export const selectItemSchema = createSelectSchema(Items).omit({
   deleted: true,
   revision: true,
   userId: true,
 })
-export type Item = z.infer<typeof selectItemDataSchema>
+export type Item = z.infer<typeof selectItemSchema>
 
 export const createItemSchema = createInsertSchema(Items).pick({
   id: true,

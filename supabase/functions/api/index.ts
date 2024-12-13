@@ -4,15 +4,11 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { z } from 'zod'
 import {
-  createItemDataSchema,
+  createItemSchema,
   InsertItem,
-  InsertProfile,
   Items,
-  Profiles,
-  selectItemDataSchema,
-  selectProfileDataSchema,
-  updateItemDataSchema,
-  updateProfileDataSchema,
+  selectItemSchema,
+  updateItemSchema,
 } from '../_database/schema.ts'
 import { AuthContextVariables, supaMiddleware, withAuthMiddleware } from '../_shared/auth.ts'
 import { db } from '../_shared/db.ts'
@@ -91,43 +87,6 @@ app.post('/auth/signin', async (c: CustomContext) => {
   return jsonRes(c, data)
 })
 
-/* PROFILES */
-
-app.get(`/profiles/:id`, withAuthMiddleware, async (c: CustomContext) => {
-  const { id } = c.req.param()
-
-  z.string().uuid().parse(id)
-
-  const profile = await db.query.Profiles.findFirst({
-    where: eq(Profiles.id, id),
-  })
-
-  if (!profile) {
-    return failRes(c, 'Profile not found', 404)
-  }
-
-  return jsonRes(c, profile, { schema: selectProfileDataSchema })
-})
-
-app.put(`/profiles/:id`, withAuthMiddleware, async (c: CustomContext) => {
-  const id = z.string().uuid().parse(c.req.param().id)
-
-  const payload = await c.req.json()
-  const data = updateProfileDataSchema.parse(payload) as InsertProfile
-
-  const [updatedProfile] = await db
-    .update(Profiles)
-    .set(data)
-    .where(eq(Profiles.id, id))
-    .returning()
-
-  if (!updatedProfile) {
-    return failRes(c, 'Profile not found', 404)
-  }
-
-  return jsonRes(c, updatedProfile, { schema: selectProfileDataSchema })
-})
-
 /* ITEMS */
 
 app.get(`/items`, withAuthMiddleware, async (c: CustomContext) => {
@@ -138,7 +97,7 @@ app.get(`/items`, withAuthMiddleware, async (c: CustomContext) => {
     .from(Items)
     .where(and(eq(Items.userId, user.id), eq(Items.deleted, false)))
 
-  return jsonRes(c, items, { schema: selectItemDataSchema.array() })
+  return jsonRes(c, items, { schema: selectItemSchema.array() })
 })
 
 app.get(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {
@@ -156,14 +115,14 @@ app.get(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {
     return failRes(c, 'Item not found', 404)
   }
 
-  return jsonRes(c, item, { schema: selectItemDataSchema })
+  return jsonRes(c, item, { schema: selectItemSchema })
 })
 
 app.post(`/items`, withAuthMiddleware, async (c: CustomContext) => {
   const user = c.get('user')!
 
   const payload = await c.req.json()
-  const data = createItemDataSchema.parse(payload) as InsertItem
+  const data = createItemSchema.parse(payload) as InsertItem
 
   const [newItem] = await db
     .insert(Items)
@@ -173,7 +132,7 @@ app.post(`/items`, withAuthMiddleware, async (c: CustomContext) => {
     })
     .returning()
 
-  return jsonRes(c, newItem, { schema: selectItemDataSchema })
+  return jsonRes(c, newItem, { schema: selectItemSchema })
 })
 
 app.put(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {
@@ -182,7 +141,7 @@ app.put(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {
   const id = z.string().uuid().parse(c.req.param().id)
 
   const payload = await c.req.json()
-  const data = updateItemDataSchema.parse(payload) as InsertItem
+  const data = updateItemSchema.parse(payload) as InsertItem
 
   const [updatedItem] = await db
     .update(Items)
@@ -194,7 +153,7 @@ app.put(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {
     return failRes(c, 'Item not found', 404)
   }
 
-  return jsonRes(c, updatedItem, { schema: selectItemDataSchema })
+  return jsonRes(c, updatedItem, { schema: selectItemSchema })
 })
 
 app.delete(`/items/:id`, withAuthMiddleware, async (c: CustomContext) => {

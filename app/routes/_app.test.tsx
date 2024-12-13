@@ -21,12 +21,16 @@ import { Input } from '@/lib/ui/input'
 import { Label } from '@/lib/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/lib/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/lib/ui/table'
-import { DEFAULT_ITEM_TYPE, ItemTypeList, type Item } from '@/modules/items/items'
+import {
+  DEFAULT_ITEM_TYPE,
+  ItemTypeList,
+  type CreateItemData,
+  type Item,
+} from '@/modules/items/items'
 import { createItemMutation } from '@/modules/items/mutators'
 import { listItems } from '@/modules/items/queries'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
-import type { CreateItemData } from 'database/schema'
 import { format as formatDate } from 'date-fns'
 import isHotkey from 'is-hotkey'
 import { MoreHorizontal, Plus } from 'lucide-react'
@@ -113,7 +117,7 @@ export const itemFormSchema = z.object({
   type: z.enum(ItemTypeList, {
     required_error: 'Select type',
   }),
-  tags: z.string(),
+  // tags: z.string(),
 })
 
 export type ItemFormData = z.infer<typeof itemFormSchema>
@@ -123,7 +127,7 @@ function ItemForm({ onSubmit, item }: { onSubmit: (data: ItemFormData) => void; 
     resolver: zodResolver(itemFormSchema),
     defaultValues: {
       text: item?.text ?? '',
-      tags: item?.tags?.join(', ') ?? '',
+      // tags: item?.tags?.join(', ') ?? '',
       type: item?.type ?? DEFAULT_ITEM_TYPE,
     },
   })
@@ -175,13 +179,13 @@ function ItemForm({ onSubmit, item }: { onSubmit: (data: ItemFormData) => void; 
             <Label htmlFor="tags" className="text-right">
               Tags
             </Label>
-            <Input
+            {/* <Input
               id="tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               className="col-span-3"
               placeholder="tag1, tag2, tag3"
-            />
+            /> */}
           </div>
         </div>
         <DialogFooter>
