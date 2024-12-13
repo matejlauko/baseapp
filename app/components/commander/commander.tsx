@@ -6,7 +6,9 @@ import {
   CommandList,
   CommandShortcut,
 } from '@/lib/ui/command'
-import { useEffect, useState } from 'react'
+import { skipMaybe } from '@/lib/utils'
+import { useMemo, useState } from 'react'
+import { isHotkeyPressed, useHotkeys } from 'react-hotkeys-hook'
 import { useSnapshot } from 'valtio'
 import { commanderStore } from './commander-store'
 
@@ -14,19 +16,41 @@ export function Commander() {
   const { commands } = useSnapshot(commanderStore)
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        event.stopPropagation()
+  /* Open commander when pressing mod+k */
+  useHotkeys('mod+k', () => setOpen(true), {
+    enableOnContentEditable: true,
+    enableOnFormTags: true,
+    preventDefault: true,
+  })
 
-        setOpen(true)
+  const hotkeys = useMemo(
+    () => commands.map((command) => command.hotkey).filter(skipMaybe),
+    [commands]
+  )
+
+  /* Handle command hotkeys */
+  useHotkeys(
+    hotkeys,
+    (event) => {
+      console.log('COMMAND', event)
+
+      for (const command of commands) {
+        if (command.hotkey && isHotkeyPressed(command.hotkey)) {
+          console.log('HOTKEY PRESSED', command.hotkey)
+
+          command.action()
+        }
       }
-    }
 
-    document.addEventListener('keydown', handleKeydown)
-    return () => document.removeEventListener('keydown', handleKeydown)
-  }, [])
+      setOpen(false)
+    },
+    {
+      enableOnContentEditable: open,
+      enableOnFormTags: open,
+      preventDefault: true,
+    },
+    [open, commands]
+  )
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen} title="Command bar">
@@ -36,9 +60,9 @@ export function Commander() {
 
         {commands.map((command) => (
           <CommandItem key={command.name} onSelect={command.action}>
-            {command.icon && <command.icon size={16} />}
+            {command.icon && <command.icon />}
             {command.name}
-            {command.shortcut && <CommandShortcut>{command.shortcut}</CommandShortcut>}
+            {command.hotkey && <CommandShortcut>{command.hotkey}</CommandShortcut>}
           </CommandItem>
         ))}
       </CommandList>

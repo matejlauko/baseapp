@@ -1,4 +1,4 @@
-import { addCommands, removeCommands } from '@/components/commander/commander-store'
+import { addCommands, removeCommands, type Command } from '@/components/commander/commander-store'
 import { useList } from '@/components/list/use-list'
 import { MarkdownContent } from '@/components/markdown-content'
 import { useMutation } from '@/lib/db/use-db'
@@ -10,14 +10,14 @@ import {
   ContextMenuTrigger,
 } from '@/lib/ui/context-menu'
 import { useToast } from '@/lib/ui/use-toast'
+import { skipMaybe } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { format as formatDate } from 'date-fns'
-import { CopyIcon, TrashIcon } from 'lucide-react'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { CopyIcon, StickyNoteIcon, TrashIcon } from 'lucide-react'
+import { memo, useEffect, useLayoutEffect, useRef } from 'react'
 import { usePress } from 'react-aria'
 import { ItemType, type Item as IItem } from '../items'
 import { createItemMutation, deleteItemMutation, updateItemMutation } from '../mutators'
-import ItemIcon from './item-icon'
 
 interface Props {
   item: IItem
@@ -32,12 +32,6 @@ function Item({ item, isSelected }: Props) {
   const updateItem = useMutation(updateItemMutation)
   const { toast } = useToast()
   const { selectItem } = useList()
-
-  const { pressProps } = usePress({
-    onPress: () => {
-      selectItem(item.id)
-    },
-  })
 
   const handleDuplicateItem = async (duplicatedItem: IItem) => {
     if (await createItem(duplicatedItem)) {
@@ -76,21 +70,29 @@ function Item({ item, isSelected }: Props) {
     })
   }
 
+  /* Scroll item into view when selected */
   useLayoutEffect(() => {
     if (isSelected) {
-      itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      itemRef.current?.scrollIntoView({ block: 'nearest' })
     }
   }, [isSelected])
 
+  /* Commands */
   useEffect(() => {
-    const commands = [
+    const commands: Command[] = [
       {
-        name: 'Delete item',
+        name: `Delete item - ${item.text}`,
         icon: TrashIcon,
-        shortcut: 'backspace',
+        hotkey: 'mod+backspace',
         action: () => handleDeleteItem(item.id),
       },
-    ]
+      {
+        name: `Duplicate item - ${item.text}`,
+        icon: CopyIcon,
+        hotkey: 'mod+d',
+        action: () => handleDuplicateItem(item),
+      },
+    ].filter(skipMaybe)
 
     if (isSelected) {
       addCommands(commands)
@@ -99,7 +101,14 @@ function Item({ item, isSelected }: Props) {
     return () => {
       removeCommands(commands)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSelected])
+
+  const { pressProps } = usePress({
+    onPress: () => {
+      selectItem(item.id)
+    },
+  })
 
   // Format date to user friendly format
   // Omit year if it's the current year
@@ -116,11 +125,11 @@ function Item({ item, isSelected }: Props) {
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <div
-          className="group/item relative flex min-h-10 scroll-m-4 items-center gap-x-3 gap-y-1 px-3 py-2"
+          className="group/item relative flex min-h-10 scroll-m-4 gap-x-3 gap-y-1 px-3 py-2"
           {...pressProps}
           ref={itemRef}
         >
-          <div className="grid w-4">
+          <div className="mt-1 w-4">
             {item.type === ItemType.Task ? (
               <div className="grid place-content-center">
                 <Checkbox
@@ -129,7 +138,7 @@ function Item({ item, isSelected }: Props) {
                 />
               </div>
             ) : (
-              <ItemIcon type={item.type} />
+              <StickyNoteIcon className="text-neutral-800" size={16} aria-label="Note type" />
             )}
           </div>
 
@@ -182,7 +191,7 @@ function Item({ item, isSelected }: Props) {
   )
 }
 
-export default Item
+export default memo(Item)
 
 // const markdownComponents: MarkdownComponents = {
 //   span: ({ node, ...props }) => {

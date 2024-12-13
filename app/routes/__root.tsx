@@ -1,7 +1,7 @@
 import type { AuthContext } from '@/lib/auth/auth-context'
 import { ThemeProvider } from '@/lib/ui/theme/theme-provider'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+// import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 interface RouterContext {
   auth: AuthContext
@@ -18,7 +18,7 @@ function RootComponent() {
         <Outlet />
       </ThemeProvider>
 
-      <TanStackRouterDevtools position="bottom-right" />
+      {/* <TanStackRouterDevtools position="bottom-right" /> */}
     </>
   )
 }

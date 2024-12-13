@@ -1,10 +1,10 @@
 import type { LucideProps } from 'lucide-react'
 import { proxy } from 'valtio'
 
-interface Command {
+export interface Command {
   name: string
   action: () => void
-  shortcut?: string
+  hotkey?: string
   icon?: React.FC<LucideProps>
 }
 

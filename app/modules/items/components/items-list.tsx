@@ -21,7 +21,7 @@ function ItemsList() {
             role="listitem"
             key={item.id}
             className={cn(
-              'group/item hover:ring-neutral-a200 relative isolate rounded-lg hover:ring has-data-[state=open]:bg-neutral-100',
+              'group/item hover:ring-neutral-a400 relative isolate rounded-lg hover:ring has-data-[state=open]:bg-neutral-100',
               isSelected && 'bg-neutral-100'
             )}
             data-selected={isSelected || undefined}

@@ -1,13 +1,12 @@
 import { Editor } from '@/components/editor/editor'
 import { useEditor } from '@/components/editor/use-editor'
 import { listStore } from '@/components/list/list-store'
-import { useList } from '@/components/list/use-list'
 import { useMutation } from '@/lib/db/use-db'
 import { getLogger } from '@/lib/logger'
 import { cn } from '@/lib/ui/utils'
 import { DEFAULT_ITEM_TYPE } from '@/modules/items/items'
 import { createItemMutation } from '@/modules/items/mutators'
-import { useEffect, useImperativeHandle } from 'react'
+import { useEffect } from 'react'
 import { useSnapshot } from 'valtio'
 import { inputStore } from '../store'
 
@@ -69,28 +68,7 @@ function ItemInput() {
     debounceDuration: 150,
   })
 
-  const { itemInputRef } = useList()
-
-  useImperativeHandle(itemInputRef, (): ItemInputApi => {
-    return {
-      focus: () => {
-        editor?.commands.focus()
-      },
-      blur: () => {
-        editor?.commands.blur()
-      },
-      isFocused: () => {
-        return editor?.isFocused ?? false
-      },
-      hasContent: () => {
-        return Boolean(editor?.getText().trim())
-      },
-    }
-  }, [editor])
-
-  /**
-   * Starts writing in the editor when pressing a letter or a number wherever.
-   */
+  /* Starts writing in the editor when pressing a letter or a number wherever */
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // If user is focused on editor, has has more content than 1 paragraph, stop other keyboard events (list nav)
@@ -117,13 +95,21 @@ function ItemInput() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [editor])
 
+  /* Focus when no item is selected, blur when an item is selected */
+  useEffect(() => {
+    if (selectedItemId) {
+      editor?.commands.blur()
+    } else {
+      editor?.commands.focus()
+    }
+  }, [editor, selectedItemId])
+
   return (
-    <div className="bg-panel flex flex-col rounded-md shadow-sm">
+    <div className="bg-panel ring-line has-focus:ring-accent-a400 border-line flex flex-col rounded-md ring-2 shadow-sm transition-colors has-focus:ring-2">
       <Editor
         editor={editor}
         className={cn(
-          'ItemInput [&_.Editor]:min-h-8 [&_.Editor]:ps-3 [&_.Editor]:pe-12 [&_.Editor]:pt-2 [&_.Editor]:pb-4 [&_.Editor]:font-medium',
-          !selectedItemId && 'ring-accent-a400 has-focus:ring-2'
+          'ItemInput [&_.Editor]:min-h-8 [&_.Editor]:ps-3 [&_.Editor]:pe-12 [&_.Editor]:pt-2 [&_.Editor]:pb-4 [&_.Editor]:font-medium'
         )}
       />
 
