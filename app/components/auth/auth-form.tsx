@@ -40,7 +40,13 @@ export function AuthForm({ onSubmit }: Props) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="name@example.com" {...field} />
+                  <Input
+                    autoFocus
+                    autoComplete="work email"
+                    placeholder="name@example.com"
+                    type="email"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

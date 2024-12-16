@@ -22,15 +22,26 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
-const CommandDialog = ({ title, children, ...props }: DialogProps & { title?: string }) => {
+const CommandDialog = ({
+  title,
+  children,
+  commandProps,
+  ...dialogProps
+}: DialogProps & {
+  title?: string
+  commandProps?: React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+}) => {
   return (
-    <Dialog {...props}>
+    <Dialog {...dialogProps}>
       <DialogContent className="overflow-hidden p-0">
         <VisuallyHidden>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{title}</DialogDescription>
         </VisuallyHidden>
-        <Command className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3">
+        <Command
+          className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3"
+          {...commandProps}
+        >
           {children}
         </Command>
       </DialogContent>
@@ -127,7 +138,7 @@ const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanE
   return (
     <span
       className={cn(
-        'bg-muted text-muted-foreground ml-auto rounded-sm border px-1 py-px text-xs tracking-widest',
+        'bg-muted text-muted-foreground ml-auto rounded-sm border px-1 py-px text-xs font-medium tracking-wide',
         className
       )}
       {...props}

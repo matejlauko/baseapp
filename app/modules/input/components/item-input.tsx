@@ -5,11 +5,12 @@ import { useList } from '@/components/list/use-list'
 import { useMutation } from '@/lib/db/use-db'
 import { getLogger } from '@/lib/logger'
 import { cn } from '@/lib/ui/utils'
-import { DEFAULT_ITEM_TYPE } from '@/modules/items/items'
+import { DEFAULT_ITEM_TYPE, ItemType } from '@/modules/items/items'
 import { createItemMutation } from '@/modules/items/mutators'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSnapshot } from 'valtio'
 import { inputStore } from '../store'
+import ItemTypeSelect from './item-type-select'
 
 const { captureError } = getLogger('input')
 
@@ -17,16 +18,19 @@ function ItemInput() {
   const createItem = useMutation(createItemMutation)
   const { selectedItemId } = useSnapshot(listStore)
   const { selectNext } = useList()
+  const [type, setType] = useState<ItemType | undefined>(undefined)
 
   const handleSubmit = () => {
     const content = editor?.storage.markdown.getMarkdown()?.trim()
 
     if (!content) return
 
+    const { text, type } = parseItem(content)
+
     try {
       void createItem({
-        text: content,
-        type: DEFAULT_ITEM_TYPE,
+        text,
+        type: type || DEFAULT_ITEM_TYPE,
       })
     } catch (error) {
       captureError('handleSubmit - createItem', error)
@@ -57,7 +61,13 @@ function ItemInput() {
       const content = editor.getText().trim()
 
       if (content) {
-        inputStore.searchTerm = content
+        const { text, type } = parseItem(content)
+
+        inputStore.searchTerm = text
+
+        setType(type || undefined)
+      } else {
+        setType(undefined)
       }
     },
     debounceDuration: 150,
@@ -100,8 +110,10 @@ function ItemInput() {
     }
   }, [editor, selectedItemId])
 
+  const hasContent = editor?.getText().trim()
+
   return (
-    <div className="bg-panel ring-line has-focus:ring-accent-a400 border-line flex flex-col rounded-md ring-2 shadow-sm transition-colors has-focus:ring-2">
+    <div className="bg-panel ring-line has-focus:ring-accent-a400 border-line flex flex-col rounded-md ring-1 shadow-sm transition-colors has-focus:ring-2">
       <Editor
         editor={editor}
         className={cn(
@@ -109,37 +121,56 @@ function ItemInput() {
         )}
       />
 
-      {/* <div className="flex h-7 items-center justify-between px-2">
-        <div className="flex items-center gap-2">
-          <ItemTypeSelect currentType={inputState.type} onChange={handleTypeChange} />
-
-          <ItemTagsSelect
-            tagOptions={allTags}
-            selectedTags={inputState.tags}
-            onAddTag={handleAddTag}
-            onDeleteTag={handleDeleteTag}
+      <div
+        className="flex h-8 items-center py-1 ps-1 pe-2"
+        onClick={() => editor?.commands.focus()}
+      >
+        <div className="grow">
+          <ItemTypeSelect
+            currentType={type}
+            onChange={setType}
+            onClose={() => editor?.commands.focus()}
           />
         </div>
 
-        <div className="flex items-center">
+        <div className="flex shrink-0 items-center">
           {hasContent ? (
             <>
-              <Kbd>Enter</Kbd>&nbsp;
-              <Text size="1" className="text-gray-800">
-                to add
-              </Text>
+              <span className="bg-muted text-muted-foreground mr-0.5 ml-auto rounded-sm border px-1 py-px text-xs font-medium tracking-wide">
+                Cmd
+              </span>
+              <span className="bg-muted text-muted-foreground ml-auto rounded-sm border px-1 py-px text-xs font-medium tracking-wide">
+                Enter
+              </span>
+              &nbsp;
+              <span className="text-muted-foreground text-xs">to add</span>
             </>
           ) : (
             <>
-              <Text size="1" className="text-gray-800">
-                Add new or search
-              </Text>
+              <span className="text-muted-foreground text-xs">Add new item or search</span>
             </>
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }
 
 export default ItemInput
+
+const typeRegex = new RegExp(`^(${Object.values(ItemType).join('|')}):`)
+
+function parseItem(input: string): {
+  type: ItemType | undefined
+  text: string
+} {
+  const typeMatch = input.match(typeRegex)
+
+  const type = typeMatch ? (typeMatch[1] as ItemType) : undefined
+  const text = type ? input.replace(typeRegex, '') : input
+
+  return {
+    type,
+    text,
+  }
+}

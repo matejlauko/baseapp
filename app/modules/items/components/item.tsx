@@ -13,7 +13,7 @@ import { useToast } from '@/lib/ui/use-toast'
 import { skipMaybe } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { format as formatDate } from 'date-fns'
-import { CopyIcon, StickyNoteIcon, TrashIcon } from 'lucide-react'
+import { CopyIcon, SquareCheckIcon, StickyNoteIcon, TrashIcon } from 'lucide-react'
 import { memo, useEffect, useLayoutEffect, useRef } from 'react'
 import { usePress } from 'react-aria'
 import { ItemType, type Item as IItem } from '../items'
@@ -80,14 +80,22 @@ function Item({ item, isSelected }: Props) {
   /* Commands */
   useEffect(() => {
     const commands: Command[] = [
+      item.type === ItemType.Task
+        ? {
+            name: item.completed ? 'Mark as incomplete' : 'Mark as complete',
+            icon: SquareCheckIcon,
+            hotkey: 'enter',
+            action: () => handleTaskCompletedChange(!item.completed),
+          }
+        : null,
       {
-        name: `Delete item - ${item.text}`,
+        name: `Delete item`,
         icon: TrashIcon,
         hotkey: 'meta+backspace',
         action: () => handleDeleteItem(item.id),
       },
       {
-        name: `Duplicate item - ${item.text}`,
+        name: `Duplicate item`,
         icon: CopyIcon,
         hotkey: 'meta+d',
         action: () => handleDuplicateItem(item),
@@ -102,7 +110,7 @@ function Item({ item, isSelected }: Props) {
       removeCommands(commands)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelected])
+  }, [isSelected, item.type, item.completed])
 
   const { pressProps } = usePress({
     onPress: () => {
@@ -134,6 +142,7 @@ function Item({ item, isSelected }: Props) {
               <div className="grid place-content-center">
                 <Checkbox
                   aria-label="Toggle task done"
+                  checked={item.completed ?? false}
                   onCheckedChange={handleTaskCompletedChange}
                 />
               </div>

@@ -64,4 +64,8 @@ export const updateItemMutation =
     }
   }
 
-export const deleteItemMutation = (db: DB) => async (id: ItemId) => db.mutate.deleteItem(id)
+export const deleteItemMutation = (db: DB) => async (id: ItemId) => {
+  await db.mutate.deleteItem(id)
+
+  return id
+}

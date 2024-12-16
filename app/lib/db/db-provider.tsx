@@ -9,6 +9,15 @@ export const DBProvider = ({ children }: PropsWithChildren) => {
 
   if (!dbRef.current && !auth.isLoading) {
     dbRef.current = initDB(auth.session)
+
+    const db = dbRef.current
+
+    db.getAuth = async () => {
+      await auth.signOut()
+      window.location.reload()
+
+      return null
+    }
   }
 
   if (!dbRef.current) {

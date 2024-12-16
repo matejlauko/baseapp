@@ -15,7 +15,7 @@ export const commanderStore = proxy<{
 })
 
 export const addCommands = (commands: Command[]) => {
-  commanderStore.commands.push(...commands)
+  commanderStore.commands.unshift(...commands)
 }
 
 export const removeCommands = (commands: Command[]) => {

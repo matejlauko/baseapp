@@ -21,3 +21,7 @@ export const listItems = async (tx: ReadTransaction) => {
     (a.updatedAt ?? a.createdAt) < (b.updatedAt ?? b.createdAt) ? 1 : -1
   )
 }
+
+export const dumpAllItems = async (tx: ReadTransaction) => {
+  return itemQueries.list(tx)
+}

@@ -43,7 +43,7 @@ export const withAuthMiddleware = createMiddleware(async (c: AuthContext, next) 
   } = await supaClient.auth.getUser()
 
   if (!user) {
-    return c.text('Unauthorized', 401) // TODO: test on client
+    return c.text('Unauthorized', 401)
   }
 
   c.set('user', user)

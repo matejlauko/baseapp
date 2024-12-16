@@ -4,7 +4,9 @@ import { addCommands, removeCommands, type Command } from '@/components/commande
 import SyncStatus from '@/components/sync/sync-status'
 import { useAuth } from '@/lib/auth/use-auth'
 import { DBProvider } from '@/lib/db/db-provider'
-import { createFileRoute, Outlet, useNavigate, useRouter } from '@tanstack/react-router'
+import { Button } from '@/lib/ui/button'
+import { createFileRoute, Link, Outlet, useNavigate, useRouter } from '@tanstack/react-router'
+import { UserIcon } from 'lucide-react'
 import { useCallback, useEffect } from 'react'
 import { HotkeysProvider } from 'react-hotkeys-hook'
 
@@ -60,7 +62,15 @@ function AppLayout() {
         <Outlet />
 
         <BottomBar>
-          <SyncStatus />
+          {auth.isAuthenticated ? (
+            <SyncStatus />
+          ) : (
+            <Button variant="ghost" asChild>
+              <Link to="/login">
+                <UserIcon size={20} /> Login to sync
+              </Link>
+            </Button>
+          )}
         </BottomBar>
 
         <Commander />

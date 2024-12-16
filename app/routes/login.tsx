@@ -1,9 +1,11 @@
 import { AuthForm, type AuthFormData } from '@/components/auth/auth-form'
+import { BottomBar } from '@/components/bottom-bar'
 import { useAuth } from '@/lib/auth/use-auth'
+import { Button } from '@/lib/ui/button'
 import { Card, CardDescription, CardTitle } from '@/lib/ui/card'
 import { useToast } from '@/lib/ui/use-toast'
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { CheckCircle2Icon } from 'lucide-react'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { ArrowLeftIcon, CheckCircle2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { z } from 'zod'
 
@@ -37,24 +39,35 @@ function AuthPage() {
   }
 
   return (
-    <div className="container grid min-h-dvh place-items-center">
-      <Card className="w-full max-w-md p-6">
-        <CardTitle className="mb-1 text-center text-2xl">Login or sign up</CardTitle>
-        <CardDescription className="text-center">
-          Receive an email with a magic link to login or sign up
-        </CardDescription>
+    <>
+      <div className="container grid min-h-dvh place-items-center">
+        <Card className="w-full max-w-md p-6">
+          <CardTitle className="mb-1 text-center text-2xl">Login or sign up</CardTitle>
+          <CardDescription className="text-center">
+            Receive an email with a magic link to login or sign up
+          </CardDescription>
 
-        <div className="mx-auto mt-6 max-w-sm">
-          <AuthForm onSubmit={handleLogin} />
-        </div>
-
-        {showSuccess && (
-          <div className="mt-6 flex max-w-sm items-center justify-center space-x-2 text-sm">
-            <CheckCircle2Icon className="text-green-500" />
-            <span>Check your email for a magic link</span>
+          <div className="mx-auto mt-6 max-w-sm">
+            <AuthForm onSubmit={handleLogin} />
           </div>
-        )}
-      </Card>
-    </div>
+
+          {showSuccess && (
+            <div className="mt-6 flex max-w-sm items-center justify-center space-x-2 text-sm">
+              <CheckCircle2Icon className="text-green-500" />
+              <span>Check your email for a magic link</span>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <BottomBar>
+        <Button variant="ghost" asChild>
+          <Link to="/">
+            <ArrowLeftIcon size={20} />
+            Back to app
+          </Link>
+        </Button>
+      </BottomBar>
+    </>
   )
 }

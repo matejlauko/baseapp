@@ -21,6 +21,7 @@ export const useAuth = (): AuthContext & {
 
     try {
       const { error } = await supabase.auth.signOut()
+      window.location.reload()
 
       if (error) {
         throw error
