@@ -1,21 +1,19 @@
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { useRef, type PropsWithChildren } from 'react'
 import { useAuth } from '../auth/use-auth'
-import { getDBClient, initDB, type DB } from './db'
+import { initDB, type DB } from './db'
 import { DBContext } from './db-context'
 
 export const DBProvider = ({ children }: PropsWithChildren) => {
-  const [db, setDB] = useState<DB | null>(getDBClient())
   const auth = useAuth()
+  const dbRef = useRef<DB | null>(null)
 
-  useEffect(() => {
-    if (!db && auth.session) {
-      setDB(initDB(auth.session))
-    }
-  }, [auth, auth.session, db])
+  if (!dbRef.current && !auth.isLoading) {
+    dbRef.current = initDB(auth.session)
+  }
 
-  if (!db) {
+  if (!dbRef.current) {
     return null
   }
 
-  return <DBContext.Provider value={db}>{children}</DBContext.Provider>
+  return <DBContext.Provider value={dbRef.current}>{children}</DBContext.Provider>
 }

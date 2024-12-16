@@ -11,7 +11,7 @@ import isHotkey from 'is-hotkey'
 import { useMemo, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useSnapshot } from 'valtio'
-import { commanderStore } from './commander-store'
+import { commanderStore, type Command } from './commander-store'
 
 export function Commander() {
   const { commands } = useSnapshot(commanderStore)
@@ -52,6 +52,11 @@ export function Commander() {
     [open, commands]
   )
 
+  const handleSelectCommand = (command: Command) => {
+    command.action()
+    setOpen(false)
+  }
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen} title="Command bar">
       <CommandInput placeholder="Type a command or search..." />
@@ -59,7 +64,7 @@ export function Commander() {
         <CommandEmpty>No results found.</CommandEmpty>
 
         {commands.map((command) => (
-          <CommandItem key={command.name} onSelect={command.action}>
+          <CommandItem key={command.name} onSelect={() => handleSelectCommand(command)}>
             {command.icon && <command.icon />}
             {command.name}
             {command.hotkey && <CommandShortcut>{command.hotkey}</CommandShortcut>}

@@ -6,7 +6,10 @@ export type ApiResponse<T = unknown> =
       data: T // Easier typing for successful response data
     }
 
-export const API_URL = import.meta.env.VITE_API_URL
+const apiHost = import.meta.env.VITE_API_URL
+const apiFnBasePath = import.meta.env.VITE_API_FN_BASE_PATH
+
+export const API_URL = `${apiHost}${apiFnBasePath}`
 
 export async function request<T = unknown>(
   path: string,

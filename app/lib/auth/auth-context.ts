@@ -1,14 +1,14 @@
-import type { AuthError, Session } from '@supabase/supabase-js'
+import type { Session } from '@supabase/supabase-js'
 import React from 'react'
 
 export interface AuthContext {
   session: Session | null | undefined
-  status: 'loading' | 'authenticated' | 'unauthenticated'
-  signOut: () => Promise<void | AuthError>
+  isLoading: boolean
+  isAuthenticated: boolean
 }
 
 export const AuthContext = React.createContext<AuthContext>({
   session: undefined,
-  status: 'loading',
-  signOut: () => Promise.resolve(),
+  isLoading: true,
+  isAuthenticated: false,
 })

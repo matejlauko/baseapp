@@ -1,9 +1,9 @@
+import { AuthProvider } from '@/lib/auth/auth-provider'
+import { useAuth } from '@/lib/auth/use-auth'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import ReactDOM from 'react-dom/client'
 import { routeTree } from './routeTree.gen'
 
-import { AuthProvider } from '@/lib/auth/auth-provider'
-import { useAuth } from '@/lib/auth/use-auth'
 import './index.css'
 
 // Set up a Router instance
@@ -26,7 +26,7 @@ declare module '@tanstack/react-router' {
 function App() {
   const auth = useAuth()
 
-  if (auth.status === 'loading') {
+  if (auth.isLoading) {
     return null
   }
 

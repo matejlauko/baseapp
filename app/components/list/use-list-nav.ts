@@ -1,6 +1,9 @@
+import { getLogger } from '@/lib/logger'
 import type { Item } from '@/modules/items/items'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
+
+const { log } = getLogger('list-nav')
 
 export const useListNav = ({
   items,
@@ -14,16 +17,16 @@ export const useListNav = ({
   const itemIds = useMemo(() => items?.map((item) => item.id) ?? [], [items])
 
   const prev = useCallback(() => {
-    console.log('prev')
     const currIndex = selectedItemId ? itemIds.indexOf(selectedItemId) : -1
+    const prevItem = itemIds[currIndex - 1]
 
-    // If at first item, focus the input
+    log('prev', { currIndex, prevItem })
+
+    // If at first item reset the selected item -- will focus the input
     if (currIndex === 0) {
       setSelectedItemId(null)
       return
     }
-
-    const prevItem = itemIds[currIndex - 1]
 
     setSelectedItemId(prevItem)
   }, [itemIds, selectedItemId, setSelectedItemId])
@@ -32,7 +35,7 @@ export const useListNav = ({
     const currIndex = selectedItemId ? itemIds.indexOf(selectedItemId) : -1
     const nextItem = currIndex < itemIds.length - 1 ? itemIds[currIndex + 1] : itemIds[0]
 
-    console.log('next', { itemIds, currIndex, nextItem })
+    log('next', { itemIds, currIndex, nextItem })
 
     setSelectedItemId(nextItem)
   }, [itemIds, selectedItemId, setSelectedItemId])
@@ -51,33 +54,3 @@ export const useListNav = ({
 
   return { prev, next }
 }
-
-// Handle keyboard navigation - up/down the list
-// useEffect(() => {
-//   const handleKeyDown = (event: KeyboardEvent) => {
-//     console.log('list keydown')
-
-//     // if (!itemIds) return
-
-//     // const handleListKey = () => {
-//     //   event.preventDefault()
-//     //   event.stopPropagation()
-//     // }
-
-//     // // Handle arrow down
-//     // if (event.key === 'ArrowDown') {
-//     //   handleListKey()
-
-//     // }
-
-//     // // Handle arrow up
-//     // if (event.key === 'ArrowUp') {
-//     //   handleListKey()
-
-//     // }
-//   }
-
-//   window.addEventListener('keydown', handleKeyDown)
-//   return () => window.removeEventListener('keydown', handleKeyDown)
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [itemIds, selectedItemId])

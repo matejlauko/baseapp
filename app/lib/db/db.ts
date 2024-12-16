@@ -1,27 +1,45 @@
 import type { AuthSession } from '@supabase/supabase-js'
 import { Replicache } from 'replicache'
 import { API_URL } from '../api/request'
+import { getLogger } from '../logger'
 import { mutators } from './mutators'
 import { syncStore } from './sync-store'
+
+const { log } = getLogger('db')
 
 const LICENSE_KEY = import.meta.env.VITE_REPLICACHE_LICENSE_KEY
 
 let _db: DB | null = null
 
 const getRepName = (userId?: string) => {
-  return userId ? `baseapp-db-u_${userId}` : 'baseapp-db-anon'
+  if (userId) {
+    return `baseapp-db-user_${userId}`
+  }
+
+  let tempUserId = window.localStorage.getItem('tempUserId')
+
+  if (!tempUserId) {
+    tempUserId = crypto.randomUUID().slice(0, 8)
+    window.localStorage.setItem('tempUserId', tempUserId)
+  }
+
+  return `baseapp-db-anon_${tempUserId}`
 }
 
 export function createDB(authSession?: AuthSession | null) {
-  console.log('createDB', {
-    auth: authSession?.access_token ? `Bearer ${authSession?.access_token}` : undefined,
+  const repName = getRepName(authSession?.user.id)
+
+  log('createDB', {
+    authSession,
+    repName,
   })
+
   return new Replicache({
-    name: getRepName(authSession?.user.id),
+    name: repName,
     licenseKey: LICENSE_KEY,
     mutators,
-    pushURL: `${API_URL}/push`,
-    pullURL: `${API_URL}/pull`,
+    pushURL: authSession ? `${API_URL}/push` : undefined,
+    pullURL: authSession ? `${API_URL}/pull` : undefined,
     // logLevel: 'debug',
     schemaVersion: '1.0.0',
     auth: authSession?.access_token ? `Bearer ${authSession?.access_token}` : undefined,
