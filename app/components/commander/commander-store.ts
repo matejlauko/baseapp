@@ -3,7 +3,7 @@ import { proxy } from 'valtio'
 
 export interface Command {
   name: string
-  action: () => void
+  action: (event?: KeyboardEvent) => void
   hotkey?: string
   icon?: React.FC<LucideProps>
 }

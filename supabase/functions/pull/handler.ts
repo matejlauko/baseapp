@@ -1,7 +1,7 @@
 import { and, eq, gt, max } from 'drizzle-orm'
 import { Context } from 'hono'
 import { PatchOperation } from 'replicache'
-import { Items, SyncClients } from '../_database/schema.ts'
+import { createItemSchema, Items, SyncClients } from '../_database/schema.ts'
 import { ITEMS_PREFIX } from '../_database/shared.ts'
 import { AuthContextVariables } from '../_shared/auth.ts'
 import { db } from '../_shared/db.ts'
@@ -13,7 +13,9 @@ export type PullSyncContext = Context<{
   Variables: AuthContextVariables & PullSyncContextVariables
 }>
 
-async function getLastGlobalRevision(tx: typeof db): Promise<bigint> {
+async function getLastGlobalRevision(
+  tx: Parameters<Parameters<(typeof db)['transaction']>[0]>[0]
+): Promise<bigint> {
   const lastRevRow = await tx.select({ rev: max(SyncClients.revision) }).from(SyncClients)
   return lastRevRow[0]?.rev ?? 0n
 }
@@ -77,20 +79,16 @@ export async function pullSyncHandler(
           })
         }
       } else {
-        itemsPatch.push({
-          op: 'put',
-          key: `${ITEMS_PREFIX}/${id}`,
-          value: {
-            // ...item,
-            // TODO: spread and omit or schema omit
-            id: item.id,
-            text: item.text,
-            type: item.type,
-            tags: item.tags,
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt ?? null,
-          },
-        })
+        try {
+          const value = createItemSchema.parse(item)
+          itemsPatch.push({
+            op: 'put',
+            key: `${ITEMS_PREFIX}/${id}`,
+            value,
+          })
+        } catch (e) {
+          console.error('Error parsing item', item, e)
+        }
       }
     }
 

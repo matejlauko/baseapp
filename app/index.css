@@ -19,7 +19,7 @@
   #app {
     @apply min-h-dvh;
 
-    --bottom-bar-height: theme(size.14);
+    --bottom-bar-height: calc(var(--spacing) * 14);
   }
 
   html,

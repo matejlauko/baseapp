@@ -17,9 +17,14 @@ export const getItem = (id?: ItemId) => (tx: ReadTransaction) =>
 export const listItems = async (tx: ReadTransaction) => {
   const items = await itemQueries.list(tx)
 
-  return items.sort((a, b) =>
-    (a.updatedAt ?? a.createdAt) < (b.updatedAt ?? b.createdAt) ? 1 : -1
-  )
+  return items.sort((a, b) => {
+    // First sort by order (ASC)
+    if (a.order !== b.order) {
+      return (a.order ?? 0) - (b.order ?? 0)
+    }
+    // If orders are equal, sort by updatedAt (DESC)
+    return (a.updatedAt ?? a.createdAt) < (b.updatedAt ?? b.createdAt) ? 1 : -1
+  })
 }
 
 export const dumpAllItems = async (tx: ReadTransaction) => {

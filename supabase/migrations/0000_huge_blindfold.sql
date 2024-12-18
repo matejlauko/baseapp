@@ -13,7 +13,11 @@ CREATE TABLE "app_base"."items" (
 	"updated_at" timestamp with time zone NOT NULL,
 	"deleted" boolean DEFAULT false NOT NULL,
 	"user_id" uuid,
-	"revision" bigint NOT NULL
+	"revision" bigint NOT NULL,
+	"parent_id" uuid,
+	"path" text[] DEFAULT '{}' NOT NULL,
+	"is_expanded" boolean DEFAULT true,
+	"order" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "app_base"."sync_clients" (
@@ -27,4 +31,5 @@ CREATE TABLE "app_base"."sync_clients" (
 );
 --> statement-breakpoint
 ALTER TABLE "app_base"."items" ADD CONSTRAINT "items_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "app_base"."items" ADD CONSTRAINT "items_parent_id_items_id_fk" FOREIGN KEY ("parent_id") REFERENCES "app_base"."items"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "app_base"."sync_clients" ADD CONSTRAINT "sync_clients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;

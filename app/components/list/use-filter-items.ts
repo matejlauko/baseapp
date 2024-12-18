@@ -10,14 +10,16 @@ const options: MatchSorterOptions<Item> = {
   keepDiacritics: false,
 }
 
+export function filterItems(items: Item[], searchTerm: string): Item[] {
+  if (!searchTerm.trim()) return items
+
+  return matchSorter<Item>(items, searchTerm, options)
+}
+
 export const useFilterItems = (items: Item[]): Item[] => {
   const { searchTerm } = useSnapshot(inputStore)
 
-  const filteredItems = useMemo(() => {
-    if (!searchTerm.trim()) return items
-
-    return matchSorter<Item>(items, searchTerm, options)
-  }, [items, searchTerm])
+  const filteredItems = useMemo(() => filterItems(items, searchTerm), [items, searchTerm])
 
   return filteredItems
 }

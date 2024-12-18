@@ -1,5 +1,6 @@
 import { dumpAllItems } from '@/modules/items/queries'
 import type { AuthSession } from '@supabase/supabase-js'
+import Cookies from 'js-cookie'
 import { Replicache } from 'replicache'
 import { API_URL } from '../api/request'
 import { getLogger } from '../logger'
@@ -8,7 +9,7 @@ import { syncStore } from './sync-store'
 
 const { log } = getLogger('db')
 
-const DB_TEMPUSERID_STORAGE_KEY = 'tempUserId'
+const DB_SESSION_USER_ID_STORAGE_KEY = 'sessDbUID'
 const LICENSE_KEY = import.meta.env.VITE_REPLICACHE_LICENSE_KEY
 
 let _db: DB | null = null
@@ -18,14 +19,14 @@ const getRepName = (userId?: string) => {
     return `baseapp-db-user_${userId}`
   }
 
-  let tempUserId = window.localStorage.getItem(DB_TEMPUSERID_STORAGE_KEY)
+  let sessDbUID = Cookies.get(DB_SESSION_USER_ID_STORAGE_KEY)
 
-  if (!tempUserId) {
-    tempUserId = crypto.randomUUID().slice(0, 8)
-    window.localStorage.setItem(DB_TEMPUSERID_STORAGE_KEY, tempUserId)
+  if (!sessDbUID) {
+    sessDbUID = crypto.randomUUID().slice(0, 8)
+    Cookies.set(DB_SESSION_USER_ID_STORAGE_KEY, sessDbUID, { sameSite: 'Strict' })
   }
 
-  return `baseapp-db-anon_${tempUserId}`
+  return `baseapp-db-anon_${sessDbUID}`
 }
 
 export function createDB(authSession?: AuthSession | null) {
@@ -95,10 +96,6 @@ async function restoreItems(db: DB) {
 
     await Promise.allSettled(items.map((item) => db.mutate.setItem(item)))
 
-    await Promise.allSettled(items.map((item) => oldTempDB.mutate.deleteItem(item.id)))
-
-    setTimeout(() => {
-      oldTempDB.close()
-    }, 500)
+    indexedDB.deleteDatabase(oldTempDB.idbName)
   }
 }

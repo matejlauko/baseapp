@@ -20,8 +20,11 @@ export const ItemType = {
 
 export const DEFAULT_ITEM_TYPE = ItemType.Note
 
-export type CreateItemData = Pick<CreateItem, 'text' | 'type' | 'tags'> &
+export type CreateItemData = Pick<CreateItem, 'text' | 'type' | 'tags' | 'parentId' | 'order'> &
   Partial<Pick<SchemaItem, 'completed'>>
-export type UpdateItemData = Pick<UpdateItem, 'id' | 'text' | 'type' | 'completed'>
+export type UpdateItemData = Pick<
+  UpdateItem,
+  'id' | 'text' | 'type' | 'completed' | 'parentId' | 'order'
+>
 
 export { ITEMS_PREFIX } from '../../../database/shared'

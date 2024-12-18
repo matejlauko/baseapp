@@ -33,11 +33,11 @@ export function Commander() {
   useHotkeys(
     hotkeys,
     (event) => {
+      event.stopPropagation()
+
       for (const command of commands) {
         if (command.hotkey && isHotkey(command.hotkey, event)) {
-          console.log('HOTKEY PRESSED', command.hotkey)
-
-          command.action()
+          command.action(event)
         }
       }
 
@@ -47,7 +47,7 @@ export function Commander() {
       enableOnContentEditable: open,
       enableOnFormTags: open,
       preventDefault: true,
-      // scopes: ['commander'],
+      scopes: ['commander'],
     },
     [open, commands]
   )

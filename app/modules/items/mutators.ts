@@ -34,6 +34,9 @@ export const createItemMutation =
     _data.createdAt = new Date().toISOString()
     _data.updatedAt = new Date().toISOString()
     _data.tags = data.tags ?? []
+    _data.isExpanded = true
+    _data.parentId = data.parentId ?? null
+    _data.order = data.order ?? null
 
     try {
       await db.mutate.setItem(createItemSchema.parse(_data) as Item)

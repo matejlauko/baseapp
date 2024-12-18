@@ -1,4 +1,13 @@
-import { bigint, boolean, integer, pgSchema, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigint,
+  boolean,
+  integer,
+  pgSchema,
+  text,
+  timestamp,
+  uuid,
+  type AnyPgColumn,
+} from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
@@ -29,6 +38,12 @@ export const Items = appBaseSchema.table('items', {
     onDelete: 'set null',
   }),
   revision: bigint('revision', { mode: 'bigint' }).notNull(),
+  parentId: uuid('parent_id').references((): AnyPgColumn => Items.id, {
+    onDelete: 'cascade',
+  }),
+  // path: text('path').array().notNull(), // Array of ancestor IDs (not used)
+  isExpanded: boolean('is_expanded').default(true),
+  order: integer('order'), // Order within siblings
 })
 
 export type SelectItem = typeof Items.$inferSelect
@@ -53,11 +68,14 @@ export const createItemSchema = createInsertSchema(Items).pick({
   createdAt: true,
   updatedAt: true,
   completed: true,
+  isExpanded: true,
+  parentId: true,
+  path: true,
+  order: true,
   // -- omit
   // deleted: true,
   // user_id: true,
-  // updated_at: true,
-  // rev: true,
+  // revision: true,
 })
 export type CreateItem = z.infer<typeof createItemSchema>
 
@@ -69,11 +87,15 @@ export const updateItemSchema = createInsertSchema(Items)
     tags: true,
     updatedAt: true,
     completed: true,
+    isExpanded: true,
+    parentId: true,
+    path: true,
+    order: true,
     // -- omit
     // deleted: true,
     // user_id: true,
     // created_at: true,
-    // rev: true,
+    // revision: true,
   })
   .partial()
   .required({ id: true })
@@ -92,29 +114,3 @@ export const SyncClients = appBaseSchema.table('sync_clients', {
     .references(() => AuthUsers.id, { onDelete: 'cascade' })
     .notNull(),
 })
-
-/* CHANGES */
-
-// export const changeTypeEnum = appBaseSchema.enum("change_type", [
-//   DbChangeType[ChangeType.Create],
-//   DbChangeType[ChangeType.Update],
-//   DbChangeType[ChangeType.Delete],
-// ]);
-
-// export const ItemChanges = appBaseSchema.table("item_changes", {
-//   id: uuid("id").primaryKey().defaultRandom(),
-//   createdAt: timestamp("created_at", { withTimezone: true }).notNull()
-//     .defaultNow(),
-//   rev: bigint("rev", { mode: "number" }).notNull(),
-//   type: changeTypeEnum("type").notNull(),
-//   mods: jsonb("mods"),
-//   rowId: uuid("item_id").notNull().references(() => Items.id, {
-//     onDelete: "cascade",
-//   }),
-//   userId: uuid("user_id").references(() => AuthUsers.id, {
-//     onDelete: "set null",
-//   }),
-//   syncClientId: uuid("sync_client_id").references(() => SyncClients.id, {
-//     onDelete: "set null",
-//   }),
-// });

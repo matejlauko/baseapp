@@ -15,7 +15,6 @@ import { Route as LoginImport } from './routes/login'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app.index'
 import { Route as AppUisinkImport } from './routes/_app.uisink'
-import { Route as AppTestImport } from './routes/_app.test'
 
 // Create/Update Routes
 
@@ -42,12 +41,6 @@ const AppUisinkRoute = AppUisinkImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
-const AppTestRoute = AppTestImport.update({
-  id: '/test',
-  path: '/test',
-  getParentRoute: () => AppRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -65,13 +58,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
-    }
-    '/_app/test': {
-      id: '/_app/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof AppTestImport
-      parentRoute: typeof AppImport
     }
     '/_app/uisink': {
       id: '/_app/uisink'
@@ -93,13 +79,11 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppRouteChildren {
-  AppTestRoute: typeof AppTestRoute
   AppUisinkRoute: typeof AppUisinkRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppTestRoute: AppTestRoute,
   AppUisinkRoute: AppUisinkRoute,
   AppIndexRoute: AppIndexRoute,
 }
@@ -109,14 +93,12 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/test': typeof AppTestRoute
   '/uisink': typeof AppUisinkRoute
   '/': typeof AppIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/test': typeof AppTestRoute
   '/uisink': typeof AppUisinkRoute
   '/': typeof AppIndexRoute
 }
@@ -125,17 +107,16 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_app/test': typeof AppTestRoute
   '/_app/uisink': typeof AppUisinkRoute
   '/_app/': typeof AppIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/test' | '/uisink' | '/'
+  fullPaths: '' | '/login' | '/uisink' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/test' | '/uisink' | '/'
-  id: '__root__' | '/_app' | '/login' | '/_app/test' | '/_app/uisink' | '/_app/'
+  to: '/login' | '/uisink' | '/'
+  id: '__root__' | '/_app' | '/login' | '/_app/uisink' | '/_app/'
   fileRoutesById: FileRoutesById
 }
 
@@ -166,17 +147,12 @@ export const routeTree = rootRoute
     "/_app": {
       "filePath": "_app.tsx",
       "children": [
-        "/_app/test",
         "/_app/uisink",
         "/_app/"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
-    },
-    "/_app/test": {
-      "filePath": "_app.test.tsx",
-      "parent": "/_app"
     },
     "/_app/uisink": {
       "filePath": "_app.uisink.tsx",

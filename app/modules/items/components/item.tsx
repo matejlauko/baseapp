@@ -1,6 +1,6 @@
 import { addCommands, removeCommands, type Command } from '@/components/commander/commander-store'
-import { useList } from '@/components/list/use-list'
 import { MarkdownContent } from '@/components/markdown-content'
+import { useTree } from '@/components/tree/use-tree'
 import { useMutation } from '@/lib/db/use-db'
 import { Checkbox } from '@/lib/ui/checkbox'
 import {
@@ -13,9 +13,15 @@ import { useToast } from '@/lib/ui/use-toast'
 import { skipMaybe } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { format as formatDate } from 'date-fns'
-import { CopyIcon, SquareCheckIcon, StickyNoteIcon, TrashIcon } from 'lucide-react'
-import { memo, useEffect, useLayoutEffect, useRef } from 'react'
-import { usePress } from 'react-aria'
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CopyIcon,
+  SquareCheckIcon,
+  StickyNoteIcon,
+  TrashIcon,
+} from 'lucide-react'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { ItemType, type Item as IItem } from '../items'
 import { createItemMutation, deleteItemMutation, updateItemMutation } from '../mutators'
 
@@ -31,7 +37,15 @@ function Item({ item, isSelected }: Props) {
   const deleteItem = useMutation(deleteItemMutation)
   const updateItem = useMutation(updateItemMutation)
   const { toast } = useToast()
-  const { selectItem } = useList()
+  const { nodesMap, flatNodes } = useTree()
+
+  const prevItem = useMemo(() => {
+    const node = nodesMap.get(item.id)
+
+    if (!node) return null
+
+    return flatNodes[node.index - 1]
+  }, [item.id, nodesMap, flatNodes])
 
   const handleDuplicateItem = async (duplicatedItem: IItem) => {
     if (await createItem(duplicatedItem)) {
@@ -70,6 +84,32 @@ function Item({ item, isSelected }: Props) {
     })
   }
 
+  const canIndentItem = prevItem && prevItem.parentId === item.parentId
+
+  const handleIndentItem = async (item: IItem) => {
+    if (!canIndentItem) return
+
+    updateItem({
+      id: item.id,
+      parentId: prevItem.id.toString(),
+    })
+  }
+
+  const canOutdentItem = item.parentId
+
+  const handleOutdentItem = async (item: IItem) => {
+    if (!canOutdentItem) return
+
+    const parentNode = nodesMap.get(item.parentId!)
+
+    if (!parentNode) return
+
+    updateItem({
+      id: item.id,
+      parentId: parentNode.parentId?.toString() ?? null,
+    })
+  }
+
   /* Scroll item into view when selected */
   useLayoutEffect(() => {
     if (isSelected) {
@@ -100,6 +140,30 @@ function Item({ item, isSelected }: Props) {
         hotkey: 'meta+d',
         action: () => handleDuplicateItem(item),
       },
+      canIndentItem
+        ? {
+            name: 'Indent item',
+            icon: ArrowRightIcon,
+            hotkey: ']',
+            action: (event?: KeyboardEvent) => {
+              event?.preventDefault()
+              event?.stopPropagation()
+              handleIndentItem(item)
+            },
+          }
+        : null,
+      canOutdentItem
+        ? {
+            name: 'Outdent item',
+            icon: ArrowLeftIcon,
+            hotkey: '[',
+            action: (event?: KeyboardEvent) => {
+              event?.preventDefault()
+              event?.stopPropagation()
+              handleOutdentItem(item)
+            },
+          }
+        : null,
     ].filter(skipMaybe)
 
     if (isSelected) {
@@ -110,13 +174,7 @@ function Item({ item, isSelected }: Props) {
       removeCommands(commands)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelected, item.type, item.completed])
-
-  const { pressProps } = usePress({
-    onPress: () => {
-      selectItem(item.id)
-    },
-  })
+  }, [isSelected, item.type, item.completed, item.parentId, canIndentItem, canOutdentItem])
 
   // Format date to user friendly format
   // Omit year if it's the current year
@@ -134,7 +192,6 @@ function Item({ item, isSelected }: Props) {
       <ContextMenuTrigger asChild>
         <div
           className="group/item relative flex min-h-10 scroll-m-4 gap-x-3 gap-y-1 px-3 py-2"
-          {...pressProps}
           ref={itemRef}
         >
           <div className="mt-1 w-4">

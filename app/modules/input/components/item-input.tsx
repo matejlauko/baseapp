@@ -1,7 +1,7 @@
 import { Editor } from '@/components/editor/editor'
 import { useCreateEditor } from '@/components/editor/use-create-editor'
-import { listStore } from '@/components/list/list-store'
-import { useList } from '@/components/list/use-list'
+import { treeStore } from '@/components/tree/store'
+import { useTree } from '@/components/tree/use-tree'
 import { useMutation } from '@/lib/db/use-db'
 import { getLogger } from '@/lib/logger'
 import { cn } from '@/lib/ui/utils'
@@ -16,8 +16,8 @@ const { captureError } = getLogger('input')
 
 function ItemInput() {
   const createItem = useMutation(createItemMutation)
-  const { selectedItemId } = useSnapshot(listStore)
-  const { selectNext } = useList()
+  const { selectedItemId } = useSnapshot(treeStore)
+  const { selectFirst } = useTree()
   const [type, setType] = useState<ItemType | undefined>(undefined)
 
   const handleSubmit = () => {
@@ -79,13 +79,14 @@ function ItemInput() {
       // When pressing down arrow, select next item, but only if the editor doesn't have more than 1 paragraph
       if (event.key === 'ArrowDown' && editor?.isFocused && editor?.state.doc.childCount <= 1) {
         event.preventDefault()
-        selectNext()
+        selectFirst()
       }
 
       // If user is focused out and pressed a letter or a number key, focus the editor, without
       if (
         !editor?.isFocused &&
         event.key.length === 1 &&
+        !['[', ']'].includes(event.key) && // TODO: figure out how to stop commander propagation
         !event.ctrlKey &&
         !event.metaKey &&
         !event.altKey
@@ -99,7 +100,7 @@ function ItemInput() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [editor, selectNext])
+  }, [editor, selectFirst])
 
   /* Focus when no item is selected, blur when an item is selected */
   useEffect(() => {
