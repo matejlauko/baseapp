@@ -1,5 +1,5 @@
 {
-  "id": "93427033-e53d-4170-93c8-e164cc4c5d5d",
+  "id": "4e59d111-0ff6-4cc1-9de2-409654bfe2c6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -95,13 +95,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "path": {
-          "name": "path",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
         "is_expanded": {
           "name": "is_expanded",
           "type": "boolean",
@@ -113,8 +106,7 @@
           "name": "order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": 0
+          "notNull": false
         }
       },
       "indexes": {},

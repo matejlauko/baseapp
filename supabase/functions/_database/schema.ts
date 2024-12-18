@@ -70,7 +70,7 @@ export const createItemSchema = createInsertSchema(Items).pick({
   completed: true,
   isExpanded: true,
   parentId: true,
-  path: true,
+  // path: true,
   order: true,
   // -- omit
   // deleted: true,
@@ -89,7 +89,7 @@ export const updateItemSchema = createInsertSchema(Items)
     completed: true,
     isExpanded: true,
     parentId: true,
-    path: true,
+    // path: true,
     order: true,
     // -- omit
     // deleted: true,

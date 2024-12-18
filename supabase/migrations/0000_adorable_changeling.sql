@@ -15,9 +15,8 @@ CREATE TABLE "app_base"."items" (
 	"user_id" uuid,
 	"revision" bigint NOT NULL,
 	"parent_id" uuid,
-	"path" text[] DEFAULT '{}' NOT NULL,
 	"is_expanded" boolean DEFAULT true,
-	"order" integer DEFAULT 0 NOT NULL
+	"order" integer
 );
 --> statement-breakpoint
 CREATE TABLE "app_base"."sync_clients" (
