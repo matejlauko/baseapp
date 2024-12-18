@@ -127,7 +127,7 @@ export const sortableTreeKeyboardCoordinates: (
               nodes,
               activeId: active.id,
               overId: closestId,
-              dragOffset: (newItem.path.length - activeItem.path.length) * indentationWidth,
+              dragOffset: (newItem.depth - activeItem.depth) * indentationWidth,
               indentationWidth,
               nodesMap,
             })
