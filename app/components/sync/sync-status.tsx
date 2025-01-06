@@ -51,7 +51,7 @@ const SyncStatus: React.FC = () => {
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={isSyncEnabled ? handleSyncClick : undefined}
           aria-disabled={!isSyncEnabled}
         >

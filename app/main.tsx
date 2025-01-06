@@ -6,9 +6,6 @@ import { routeTree } from './routeTree.gen'
 
 import './index.css'
 
-console.log('ALL', import.meta.env)
-console.log('VITE_SUPABASE_URL', import.meta.env.VITE_SUPABASE_URL)
-
 // Set up a Router instance
 const router = createRouter({
   routeTree,

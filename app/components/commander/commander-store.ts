@@ -1,29 +1,28 @@
+import { atom } from 'jotai'
 import type { LucideProps } from 'lucide-react'
-import { proxy } from 'valtio'
 
 export interface Command {
   name: string
   action: (event?: KeyboardEvent) => void
   hotkey?: string
   icon?: React.FC<LucideProps>
+  scope?: string
 }
 
-export const commanderStore = proxy<{
-  commands: Command[]
-}>({
-  commands: [],
-})
+export const commandsAtom = atom<Command[]>([])
 
-export const addCommands = (commands: Command[]) => {
-  commanderStore.commands.unshift(...commands)
-}
+export const addCommandsAtom = atom(
+  null, // it's a convention to pass `null` for the first argument
+  (_get, set, { commands, scope }: { commands: Command[]; scope?: string }) => {
+    const _commands = commands.map((c) => ({ ...c, scope }))
 
-export const removeCommands = (commands: Command[]) => {
-  for (const command of commands) {
-    const index = commanderStore.commands.findIndex((c) => c.name === command.name)
-
-    if (index !== -1) {
-      commanderStore.commands.splice(index, 1)
-    }
+    set(commandsAtom, (state) => [..._commands, ...state])
   }
-}
+)
+
+export const removeCommandsAtom = atom(
+  null,
+  (_get, set, { commands, scope }: { commands: Command[]; scope: string }) => {
+    set(commandsAtom, (state) => state.filter((c) => c.scope !== scope))
+  }
+)

@@ -8,13 +8,13 @@ import {
 } from '@/lib/ui/command'
 import { skipMaybe } from '@/lib/utils'
 import isHotkey from 'is-hotkey'
+import { useAtomValue } from 'jotai'
 import { useMemo, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-import { useSnapshot } from 'valtio'
-import { commanderStore, type Command } from './commander-store'
+import { commandsAtom, type Command } from './commander-store'
 
 export function Commander() {
-  const { commands } = useSnapshot(commanderStore)
+  const commands = useAtomValue(commandsAtom)
   const [open, setOpen] = useState(false)
 
   /* Open commander when pressing mod+k */
@@ -67,7 +67,9 @@ export function Commander() {
           <CommandItem key={command.name} onSelect={() => handleSelectCommand(command)}>
             {command.icon && <command.icon />}
             {command.name}
-            {command.hotkey && <CommandShortcut>{command.hotkey}</CommandShortcut>}
+            {command.hotkey && (
+              <CommandShortcut>{command.hotkey.replace('meta', '⌘')}</CommandShortcut>
+            )}
           </CommandItem>
         ))}
       </CommandList>

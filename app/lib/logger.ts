@@ -1,3 +1,5 @@
+const ENABLED = false
+
 export function getLogger(ns = '') {
   function log(
     message: string,
@@ -13,6 +15,7 @@ export function getLogger(ns = '') {
     //   data: _data,
     // });
 
+    if (!ENABLED) return
     if (ns) {
       console.log(`[${ns}]`, message, ...data)
     } else {
@@ -33,6 +36,8 @@ export function getLogger(ns = '') {
     //   message,
     //   data: _data,
     // });
+
+    if (!ENABLED) return
 
     message = ns ? `[${ns}] ${message}` : message
 

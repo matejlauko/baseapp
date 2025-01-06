@@ -1,4 +1,8 @@
-import { addCommands, removeCommands, type Command } from '@/components/commander/commander-store'
+import {
+  addCommandsAtom,
+  removeCommandsAtom,
+  type Command,
+} from '@/components/commander/commander-store'
 import { MarkdownContent } from '@/components/markdown-content'
 import { useTree } from '@/components/tree/use-tree'
 import { useMutation } from '@/lib/db/use-db'
@@ -11,8 +15,8 @@ import {
 } from '@/lib/ui/context-menu'
 import { useToast } from '@/lib/ui/use-toast'
 import { skipMaybe } from '@/lib/utils'
-import { useNavigate } from '@tanstack/react-router'
 import { format as formatDate } from 'date-fns'
+import { useSetAtom } from 'jotai'
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -21,7 +25,7 @@ import {
   StickyNoteIcon,
   TrashIcon,
 } from 'lucide-react'
-import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef } from 'react'
 import { ItemType, type Item as IItem } from '../items'
 import { createItemMutation, deleteItemMutation, updateItemMutation } from '../mutators'
 
@@ -31,21 +35,17 @@ interface Props {
 }
 
 function Item({ item, isSelected }: Props) {
+  const addCommands = useSetAtom(addCommandsAtom)
+  const removeCommands = useSetAtom(removeCommandsAtom)
   const itemRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
   const createItem = useMutation(createItemMutation)
   const deleteItem = useMutation(deleteItemMutation)
   const updateItem = useMutation(updateItemMutation)
   const { toast } = useToast()
   const { nodesMap, flatNodes } = useTree()
 
-  const prevItem = useMemo(() => {
-    const node = nodesMap.get(item.id)
-
-    if (!node) return null
-
-    return flatNodes[node.index - 1]
-  }, [item.id, nodesMap, flatNodes])
+  const node = nodesMap.get(item.id)
+  const prevItem = node && flatNodes[node.index - 1]
 
   const handleDuplicateItem = async (duplicatedItem: IItem) => {
     if (await createItem(duplicatedItem)) {
@@ -70,10 +70,6 @@ function Item({ item, isSelected }: Props) {
         title: 'Failed to delete item',
         variant: 'destructive',
       })
-    }
-
-    if (isSelected) {
-      navigate({ to: '/' })
     }
   }
 
@@ -167,14 +163,14 @@ function Item({ item, isSelected }: Props) {
     ].filter(skipMaybe)
 
     if (isSelected) {
-      addCommands(commands)
+      addCommands({ commands, scope: item.id })
     }
 
     return () => {
-      removeCommands(commands)
+      removeCommands({ commands, scope: item.id })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelected, item.type, item.completed, item.parentId, canIndentItem, canOutdentItem])
+  }, [isSelected, item])
 
   // Format date to user friendly format
   // Omit year if it's the current year

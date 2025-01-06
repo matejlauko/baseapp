@@ -5,19 +5,16 @@ import { useTree } from '@/components/tree/use-tree'
 import { useMutation } from '@/lib/db/use-db'
 import { shallowEqual } from '@/lib/utils'
 import { cva } from 'cva'
-import type { CSSProperties } from 'react'
 import { useSnapshot } from 'valtio'
 import { type Item as IItem } from '../items'
 import { updateItemMutation } from '../mutators'
 import Item from './item'
 
-const ITEM_HEIGHT_PX = 40
-
 const wrapperStyles = cva({
   base: 'pl-(--item-spacing) -mb-px relative isolate',
   variants: {
     isClone: {
-      true: 'w-fit px-2',
+      true: 'w-fit',
     },
     isDragging: {
       true: 'z-10',
@@ -26,10 +23,10 @@ const wrapperStyles = cva({
 })
 
 const treeItemStyles = cva({
-  base: 'rounded-lg',
+  base: 'rounded-lg min-h-10',
   variants: {
     isClone: {
-      true: 'bg-neutral-200/90 font-medium text-foreground flex items-center text-sm shadow-lg',
+      true: 'h-10 bg-neutral-200/90 font-medium text-foreground flex items-center text-sm shadow-lg px-2',
       false:
         'group/item hover:ring-neutral-a400 rounded-lg hover:ring has-data-[state=open]:bg-neutral-100',
     },
@@ -37,7 +34,7 @@ const treeItemStyles = cva({
       true: 'bg-neutral-100',
     },
     isDragging: {
-      true: 'h-1 border bg-accent-a600 [&>*]:opacity-0 [&>*]:h-0',
+      true: 'h-1 border bg-accent-a600 [&>*]:opacity-0 [&>*]:h-0 [&&]:min-h-0',
     },
   },
 })
@@ -63,11 +60,7 @@ function ItemsList() {
   }
 
   return (
-    <div
-      role="list"
-      className="flex flex-col gap-y-0.5 py-3"
-      style={{ '--item-height': `${ITEM_HEIGHT_PX}px` } as CSSProperties}
-    >
+    <div role="list" className="flex flex-col gap-y-0.5 py-3">
       <SortableTree<IItem> items={items} onItemsChange={handleItemsChange}>
         {({
           id,
@@ -90,12 +83,13 @@ function ItemsList() {
               role="listitem"
               style={wrapperStyle}
               className={wrapperStyles({ isClone, isDragging })}
+              data-id={id}
             >
               <div
                 {...attributes}
                 {...listeners}
                 ref={setDraggableNodeRef}
-                style={{ ...itemStyle, height: isDragging ? undefined : `${ITEM_HEIGHT_PX}px` }}
+                style={itemStyle}
                 className={treeItemStyles({ isSelected, isClone, isDragging })}
                 data-selected={isSelected || undefined}
                 aria-selected={isSelected}

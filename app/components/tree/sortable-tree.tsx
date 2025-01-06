@@ -155,8 +155,6 @@ export function SortableTree<T>({
         depth: projected.depth,
       })
 
-      console.log('newItems', newItems)
-
       onItemsChange(newItems as T[])
     }
   }

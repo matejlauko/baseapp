@@ -1,11 +1,16 @@
 import { BottomBar } from '@/components/bottom-bar'
 import { Commander } from '@/components/commander/commander'
-import { addCommands, removeCommands, type Command } from '@/components/commander/commander-store'
+import {
+  addCommandsAtom,
+  removeCommandsAtom,
+  type Command,
+} from '@/components/commander/commander-store'
 import SyncStatus from '@/components/sync/sync-status'
 import { useAuth } from '@/lib/auth/use-auth'
 import { DBProvider } from '@/lib/db/db-provider'
 import { Button } from '@/lib/ui/button'
 import { createFileRoute, Link, Outlet, useNavigate, useRouter } from '@tanstack/react-router'
+import { useSetAtom } from 'jotai'
 import { UserIcon } from 'lucide-react'
 import { useCallback, useEffect } from 'react'
 import { HotkeysProvider } from 'react-hotkeys-hook'
@@ -21,6 +26,8 @@ function AppLayout() {
   const router = useRouter()
   const auth = useAuth()
   const navigate = useNavigate({ from: '/' })
+  const addCommands = useSetAtom(addCommandsAtom)
+  const removeCommands = useSetAtom(removeCommandsAtom)
 
   const handleLogout = useCallback(() => {
     auth.signOut().then(() => {
@@ -46,13 +53,13 @@ function AppLayout() {
     ]
 
     if (auth.isAuthenticated) {
-      addCommands(loggedInCommands)
+      addCommands({ commands: loggedInCommands })
     } else {
-      addCommands(loggedOutCommands)
+      addCommands({ commands: loggedOutCommands })
     }
 
     return () => {
-      removeCommands([...loggedInCommands, ...loggedOutCommands])
+      removeCommands({ commands: [...loggedInCommands, ...loggedOutCommands], scope: 'list' })
     }
   }, [auth.isAuthenticated, router, navigate, handleLogout])
 

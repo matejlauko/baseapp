@@ -70,6 +70,7 @@ export function moveItem<T>({
   activeId,
   overId,
   parentId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   depth,
 }: {
   items: TreeItems<T>
@@ -83,23 +84,12 @@ export function moveItem<T>({
   const activeItem = nodesMap.get(activeId)!
   const newItem: TreeItem<T> = { ...activeItem, parentId }
 
-  console.log('MOVE', { activeItem, overItem, parentId, depth })
-
   if (activeItem.parentId === parentId) {
     const siblings = items.filter((item) => item.parentId === parentId)
-    console.log(
-      'Siblings',
-      siblings.map((item) => [item.id])
-    )
 
     // Add to new position
     siblings.splice(activeItem.order, 1)
     siblings.splice(overItem.order, 0, newItem)
-
-    console.log(
-      'Siblings',
-      siblings.map((item) => [item.id])
-    )
 
     const orderSiblings = siblings.map((item, idx) => ({ ...item, order: idx }))
 
@@ -120,51 +110,3 @@ export function moveItem<T>({
 
   return [...orderPrevSiblings, ...orderNewSiblings]
 }
-
-// function generateFlatNodes() {
-//   let index = 0
-
-//   function* flatNodesGenerator({
-//     treeItems,
-//     parentId = null,
-//     depth = 0,
-//   }: {
-//     treeItems: TreeItems<T>
-//     parentId?: ID | null
-//     depth?: number
-//   }): Generator<TreeNode<T>, void, unknown> {
-//     const rootItems = treeItems.filter((item) => item.parentId === parentId)
-
-//     for (let i = 0; i < rootItems.length; i++) {
-//       const item = rootItems[i]
-//       const children = item.isExpanded
-//         ? [...flatNodesGenerator({ treeItems, parentId: item.id, depth: depth + 1 })]
-//         : []
-
-//       const node: TreeNode<T> = {
-//         ...item,
-//         children,
-//         depth: depth,
-//         index: index++,
-//         // order: i,
-//       }
-
-//       nodesMap.current.set(item.id, node)
-//       console.log('NODE', node)
-
-//       yield node
-
-//       for (let j = 0; j < children.length; j++) {
-//         const child = children[j]
-//         console.log('CHILD', child)
-//         yield child
-//       }
-//     }
-//   }
-
-//   if (!items) return []
-
-//   const generator = flatNodesGenerator({ treeItems: items })
-
-//   return [...generator]
-// }

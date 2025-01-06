@@ -53,11 +53,9 @@ app.post('/auth/signup', async (c: CustomContext) => {
     password: pass,
   })
 
-  console.log('foo signup', { data, error })
-
-  return c.json({ success: false }, 401, {
-    statusText: 'Unauthorized',
-  })
+  // return c.json({ success: false }, 401, {
+  //   statusText: 'Unauthorized',
+  // })
 
   if (error) {
     throw error
@@ -76,9 +74,7 @@ app.post('/auth/signin', async (c: CustomContext) => {
     password: pass,
   })
 
-  console.log('foo signin', { data, error })
-
-  return c.text('Unauthorized', 401)
+  // return c.text('Unauthorized', 401)
 
   if (error) {
     throw error

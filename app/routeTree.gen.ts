@@ -14,7 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app.index'
-import { Route as AppUisinkImport } from './routes/_app.uisink'
+import { Route as AppUiSinkImport } from './routes/_app.ui-sink'
 
 // Create/Update Routes
 
@@ -35,9 +35,9 @@ const AppIndexRoute = AppIndexImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
-const AppUisinkRoute = AppUisinkImport.update({
-  id: '/uisink',
-  path: '/uisink',
+const AppUiSinkRoute = AppUiSinkImport.update({
+  id: '/ui-sink',
+  path: '/ui-sink',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -59,11 +59,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/_app/uisink': {
-      id: '/_app/uisink'
-      path: '/uisink'
-      fullPath: '/uisink'
-      preLoaderRoute: typeof AppUisinkImport
+    '/_app/ui-sink': {
+      id: '/_app/ui-sink'
+      path: '/ui-sink'
+      fullPath: '/ui-sink'
+      preLoaderRoute: typeof AppUiSinkImport
       parentRoute: typeof AppImport
     }
     '/_app/': {
@@ -79,12 +79,12 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppRouteChildren {
-  AppUisinkRoute: typeof AppUisinkRoute
+  AppUiSinkRoute: typeof AppUiSinkRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppUisinkRoute: AppUisinkRoute,
+  AppUiSinkRoute: AppUiSinkRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -93,13 +93,13 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/uisink': typeof AppUisinkRoute
+  '/ui-sink': typeof AppUiSinkRoute
   '/': typeof AppIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/uisink': typeof AppUisinkRoute
+  '/ui-sink': typeof AppUiSinkRoute
   '/': typeof AppIndexRoute
 }
 
@@ -107,16 +107,16 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_app/uisink': typeof AppUisinkRoute
+  '/_app/ui-sink': typeof AppUiSinkRoute
   '/_app/': typeof AppIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/uisink' | '/'
+  fullPaths: '' | '/login' | '/ui-sink' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/uisink' | '/'
-  id: '__root__' | '/_app' | '/login' | '/_app/uisink' | '/_app/'
+  to: '/login' | '/ui-sink' | '/'
+  id: '__root__' | '/_app' | '/login' | '/_app/ui-sink' | '/_app/'
   fileRoutesById: FileRoutesById
 }
 
@@ -147,15 +147,15 @@ export const routeTree = rootRoute
     "/_app": {
       "filePath": "_app.tsx",
       "children": [
-        "/_app/uisink",
+        "/_app/ui-sink",
         "/_app/"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
     },
-    "/_app/uisink": {
-      "filePath": "_app.uisink.tsx",
+    "/_app/ui-sink": {
+      "filePath": "_app.ui-sink.tsx",
       "parent": "/_app"
     },
     "/_app/": {

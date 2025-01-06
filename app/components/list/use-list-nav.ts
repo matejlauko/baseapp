@@ -27,7 +27,7 @@ export const useListNav = <T>() => {
     log('prev', { selectedItem, prevItem })
 
     selectId(prevItem.id)
-  }, [selectedItemId, selectId, flatNodes])
+  }, [selectedItemId, selectId, flatNodes, nodesMap])
 
   const next = useCallback(() => {
     const selectedItem = selectedItemId ? nodesMap.get(selectedItemId) : null
@@ -38,7 +38,7 @@ export const useListNav = <T>() => {
     log('next', { currIndex, nextItem, selectedItem })
 
     selectId(nextItem.id)
-  }, [selectedItemId, selectId, flatNodes])
+  }, [selectedItemId, selectId, flatNodes, nodesMap])
 
   const up = useCallback(() => {
     const selectedItem = selectedItemId ? nodesMap.get(selectedItemId) : null
@@ -48,7 +48,7 @@ export const useListNav = <T>() => {
     if (selectedItem.parentId) {
       selectId(selectedItem.parentId)
     }
-  }, [selectedItemId, selectId])
+  }, [selectedItemId, selectId, nodesMap])
 
   const down = useCallback(() => {
     const selectedItem = selectedItemId ? nodesMap.get(selectedItemId) : null
@@ -58,7 +58,7 @@ export const useListNav = <T>() => {
     if (selectedItem.children.length > 0) {
       selectId(selectedItem.children[0].id)
     }
-  }, [selectedItemId, selectId])
+  }, [selectedItemId, selectId, nodesMap])
 
   useHotkeys('ArrowDown', next, { scopes: ['list'] }, [next])
   useHotkeys('ArrowUp', prev, { scopes: ['list'] }, [prev])
